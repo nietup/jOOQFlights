@@ -4,7 +4,6 @@ import mgr.flights.jooq.tables.City;
 import mgr.flights.jooq.tables.daos.CityDao;
 import mgr.flights.jooq.tables.records.CityRecord;
 import org.jooq.DSLContext;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +19,8 @@ public class CityTests {
     @Autowired
     private DSLContext create;
 
+    @Autowired
     private CityDao cityDao;
-
-    @Before
-    public void configure() {
-        cityDao = new CityDao(create.configuration());
-    }
 
     @Test
     public void jOOQTableTest() {
