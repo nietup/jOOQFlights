@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/passengers")
 public class PassengerController {
@@ -22,6 +24,12 @@ public class PassengerController {
         this.passengerDao = passengerDao;
         this.flightService = flightService;
         this.passengerService = passengerService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Passenger>> getAll() {
+        List<Passenger> passengers = passengerDao.findAll();
+        return ResponseEntity.ok().body(passengers);
     }
 
     @GetMapping("/{id}")
