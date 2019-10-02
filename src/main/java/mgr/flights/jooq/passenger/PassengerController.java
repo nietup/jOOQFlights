@@ -2,7 +2,10 @@ package mgr.flights.jooq.passenger;
 
 import mgr.flights.jooq.flight.FlightService;
 import mgr.flights.jooq.tables.daos.PassengerDao;
+import mgr.flights.jooq.tables.pojos.Flight;
 import mgr.flights.jooq.tables.pojos.Passenger;
+import mgr.flights.jooq.tables.records.FlightRecord;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static mgr.flights.jooq.Tables.FLIGHT;
+import static mgr.flights.jooq.Tables.PASSENGER;
 
 @RestController
 @RequestMapping("/api/passengers")
@@ -18,12 +25,14 @@ public class PassengerController {
     private final PassengerDao passengerDao;
     private final FlightService flightService;
     private final PassengerService passengerService;
+    private final DSLContext create;
 
     @Autowired
-    public PassengerController(PassengerDao passengerDao, FlightService flightService, PassengerService passengerService) {
+    public PassengerController(PassengerDao passengerDao, FlightService flightService, PassengerService passengerService, DSLContext create) {
         this.passengerDao = passengerDao;
         this.flightService = flightService;
         this.passengerService = passengerService;
+        this.create = create;
     }
 
     @GetMapping
@@ -39,6 +48,23 @@ public class PassengerController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passenger with id: " + id + " was not found");
 
         return ResponseEntity.ok().body(passenger);
+    }
+
+    @GetMapping("/{sub}/flights")
+    public ResponseEntity<List<Flight>> getFlightsByPassegerSubject(@PathVariable String sub) {
+        List<FlightRecord> results = create
+                .selectFrom(FLIGHT)
+                .where(FLIGHT.FLIGHT_NO.in(create
+                        .select(PASSENGER.FLIGHT_NO)
+                        .from(PASSENGER)
+                        .where(PASSENGER.SUB.eq(sub))))
+                .fetch();
+
+        List<Flight> flights = results.stream()
+                .map(p -> p.into(new Flight()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(flights);
     }
 
     @PostMapping

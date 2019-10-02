@@ -115,6 +115,7 @@ CREATE TABLE public."Passenger"
     city character varying(200) COLLATE pg_catalog."default",
     country_code character varying(3) COLLATE pg_catalog."default",
     phone character varying(20) COLLATE pg_catalog."default",
+    sub character varying(50) COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT "Passenger_pkey" PRIMARY KEY (passenger_id),
     CONSTRAINT "Passenger_passport_no_key" UNIQUE (passport_no)
 ,

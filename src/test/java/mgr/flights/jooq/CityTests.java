@@ -46,7 +46,7 @@ public class CityTests {
     public void updateRecordTest() {
         CityRecord city = create
                 .selectFrom(City.CITY)
-                .where(City.CITY.CITY_ID.eq(1))
+                .where(City.CITY.CITY_ID.eq(16))
                 .fetchAny();
 
         city.setName(city.getName() + "a");
@@ -57,7 +57,7 @@ public class CityTests {
 
     @Test
     public void updatePojoTest() {
-        mgr.flights.jooq.tables.pojos.City city = cityDao.fetchOneByCityId(1);
+        mgr.flights.jooq.tables.pojos.City city = cityDao.fetchOneByCityId(16);
 
         city.setName(city.getName() + "b");
         cityDao.update(city);
