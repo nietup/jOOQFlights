@@ -2,9 +2,7 @@ package mgr.flights.jooq.passenger;
 
 import mgr.flights.jooq.flight.FlightService;
 import mgr.flights.jooq.tables.daos.PassengerDao;
-import mgr.flights.jooq.tables.pojos.Flight;
 import mgr.flights.jooq.tables.pojos.Passenger;
-import mgr.flights.jooq.tables.records.FlightRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,13 +24,15 @@ public class PassengerController {
     private final FlightService flightService;
     private final PassengerService passengerService;
     private final DSLContext create;
+    private final PassengerFlightMapper passengerFlightMapper;
 
     @Autowired
-    public PassengerController(PassengerDao passengerDao, FlightService flightService, PassengerService passengerService, DSLContext create) {
+    public PassengerController(PassengerDao passengerDao, FlightService flightService, PassengerService passengerService, DSLContext create, PassengerFlightMapper passengerFlightMapper) {
         this.passengerDao = passengerDao;
         this.flightService = flightService;
         this.passengerService = passengerService;
         this.create = create;
+        this.passengerFlightMapper = passengerFlightMapper;
     }
 
     @GetMapping
@@ -51,20 +51,20 @@ public class PassengerController {
     }
 
     @GetMapping("/{sub}/flights")
-    public ResponseEntity<List<Flight>> getFlightsByPassegerSubject(@PathVariable String sub) {
-        List<FlightRecord> results = create
-                .selectFrom(FLIGHT)
+    public ResponseEntity<List<PassengerFlightDto>> getFlightsByPassegerSubject(@PathVariable String sub) {
+        List<PassengerFlightDto> result = create
+                .select(PASSENGER.FIRST_NAME, PASSENGER.LAST_NAME, FLIGHT.FLIGHT_NO, FLIGHT.START_TIME, FLIGHT.LANDING_TIME, FLIGHT.AIRCRAFT_ID, FLIGHT.SOURCE_IATA, FLIGHT.DESTINATION_IATA)
+                .from(PASSENGER, FLIGHT)
                 .where(FLIGHT.FLIGHT_NO.in(create
                         .select(PASSENGER.FLIGHT_NO)
                         .from(PASSENGER)
                         .where(PASSENGER.SUB.eq(sub))))
-                .fetch();
-
-        List<Flight> flights = results.stream()
-                .map(p -> p.into(new Flight()))
+                .fetch()
+                .stream()
+                .map(passengerFlightMapper::toDto)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok().body(flights);
+        return ResponseEntity.ok().body(result);
     }
 
     @PostMapping
