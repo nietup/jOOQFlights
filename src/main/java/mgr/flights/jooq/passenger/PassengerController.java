@@ -55,10 +55,8 @@ public class PassengerController {
         List<PassengerFlightDto> result = create
                 .select(PASSENGER.FIRST_NAME, PASSENGER.LAST_NAME, FLIGHT.FLIGHT_NO, FLIGHT.START_TIME, FLIGHT.LANDING_TIME, FLIGHT.AIRCRAFT_ID, FLIGHT.SOURCE_IATA, FLIGHT.DESTINATION_IATA)
                 .from(PASSENGER, FLIGHT)
-                .where(FLIGHT.FLIGHT_NO.in(create
-                        .select(PASSENGER.FLIGHT_NO)
-                        .from(PASSENGER)
-                        .where(PASSENGER.SUB.eq(sub))))
+                .where(PASSENGER.FLIGHT_NO.eq(FLIGHT.FLIGHT_NO)
+                        .and(PASSENGER.SUB.eq(sub)))
                 .fetch()
                 .stream()
                 .map(passengerFlightMapper::toDto)
