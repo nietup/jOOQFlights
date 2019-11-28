@@ -3,6 +3,7 @@ package mgr.flights.jooq.passenger;
 import java.time.OffsetDateTime;
 
 public class PassengerFlightDto {
+    private String passportNo;
     private String firstName;
     private String lastName;
     private String flightNo;
@@ -12,7 +13,8 @@ public class PassengerFlightDto {
     private String sourceIata;
     private String destinationIata;
 
-    public PassengerFlightDto(String firstName, String lastName, String flightNo, OffsetDateTime startTime, OffsetDateTime landingTime, Integer aircraftId, String sourceIata, String destinationIata) {
+    public PassengerFlightDto(String passportNo, String firstName, String lastName, String flightNo, OffsetDateTime startTime, OffsetDateTime landingTime, Integer aircraftId, String sourceIata, String destinationIata) {
+        this.passportNo = passportNo;
         this.firstName = firstName;
         this.lastName = lastName;
         this.flightNo = flightNo;
@@ -88,5 +90,13 @@ public class PassengerFlightDto {
 
     public void setDestinationIata(String destinationIata) {
         this.destinationIata = destinationIata;
+    }
+
+    public String getPassportNo() {
+        return passportNo;
+    }
+
+    public void setPassportNo(String passportNo) {
+        this.passportNo = passportNo;
     }
 }

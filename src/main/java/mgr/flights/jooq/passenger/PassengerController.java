@@ -50,10 +50,19 @@ public class PassengerController {
         return ResponseEntity.ok().body(passenger);
     }
 
+    @GetMapping("/passport/{passportNo}")
+    public ResponseEntity<Passenger> get(@PathVariable String passportNo) {
+        Passenger passenger = passengerDao.fetchOneByPassportNo(passportNo);
+        if (passenger == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passenger with passport: " + passportNo + " was not found");
+
+        return ResponseEntity.ok().body(passenger);
+    }
+
     @GetMapping("/{sub}/flights")
     public ResponseEntity<List<PassengerFlightDto>> getFlightsByPassegerSubject(@PathVariable String sub) {
         List<PassengerFlightDto> result = create
-                .select(PASSENGER.FIRST_NAME, PASSENGER.LAST_NAME, FLIGHT.FLIGHT_NO, FLIGHT.START_TIME, FLIGHT.LANDING_TIME, FLIGHT.AIRCRAFT_ID, FLIGHT.SOURCE_IATA, FLIGHT.DESTINATION_IATA)
+                .select(PASSENGER.PASSPORT_NO, PASSENGER.FIRST_NAME, PASSENGER.LAST_NAME, FLIGHT.FLIGHT_NO, FLIGHT.START_TIME, FLIGHT.LANDING_TIME, FLIGHT.AIRCRAFT_ID, FLIGHT.SOURCE_IATA, FLIGHT.DESTINATION_IATA)
                 .from(PASSENGER, FLIGHT)
                 .where(PASSENGER.FLIGHT_NO.eq(FLIGHT.FLIGHT_NO)
                         .and(PASSENGER.SUB.eq(sub)))
